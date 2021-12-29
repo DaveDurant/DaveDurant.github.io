@@ -45,12 +45,21 @@
 		.querySelector("button")
 		.addEventListener("click", async (event) => 
 		{
+
+			var options = 
+			{
+				filters: 
+				[
+					{services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"]}
+				]
+			};
+
 			navigator.bluetooth
-				.requestDevice
-				({
+				.requestDevice(options)
+				//({
 					//acceptAllDevices: true,
-					Services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
-				})
+					//Services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
+				//})
 				.then((device) => 
 				{
 					Log("connecting to " + device.name);
