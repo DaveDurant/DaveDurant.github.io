@@ -21,8 +21,7 @@
 
 	function Log(msg) 
 	{
-		document.querySelector("#logs").innerHTML =
-			document.querySelector("#logs").innerHTML + "<br>" + msg;
+		document.querySelector("#logs").innerHTML = document.querySelector("#logs").innerHTML + "<br>" + msg;
 	}
 
 	function onCharChange(event) 
@@ -35,6 +34,7 @@
 
 	function onClickTime()
 	{
+		console.log("onClickTime");
 		if (mChar != null)
 		{
 
@@ -49,7 +49,7 @@
 				.requestDevice
 				({
 					//acceptAllDevices: true,
-					optionalServices: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
+					Services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
 				})
 				.then((device) => 
 				{
