@@ -37,6 +37,18 @@
 		console.log("onClickTime");
 		if (mChar != null)
 		{
+			var message = {time: new Date().getTime()};
+
+			var text = JSON.stringify(message);
+
+			var buf = new ArrayBuffer(text.length);
+
+			mChar
+				.writeValueWithResponse(buf)
+				.then(function() 
+				{
+					console.log("?");
+				});
 
 		}
 	}
