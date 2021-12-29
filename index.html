@@ -70,7 +70,7 @@
 				//})
 				.then((device) => 
 				{
-					Log("connecting to " + device.name);
+					log("connecting to " + device.name);
 					return device.gatt.connect();
 				})
 				.then((server) => 
