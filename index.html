@@ -45,9 +45,7 @@
 
 			var buf = new ArrayBuffer(text.length);
 
-			await mChar.writeValueWithResponse(buf);
-
-			console.log("..done");
+			mChar.writeValueWithResponse(buf);
 		}
 	}
 
