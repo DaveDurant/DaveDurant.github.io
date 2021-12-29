@@ -19,7 +19,7 @@
 
 	var mChar;
 
-	function Log(msg) 
+	function log(msg) 
 	{
 		document.querySelector("#logs").innerHTML = document.querySelector("#logs").innerHTML + "<br>" + msg;
 	}
@@ -29,7 +29,7 @@
 		const value = event.target.value.getUint8();
 		console.log("Received " + value);
 
-        Log("received: " + value);
+        log("received: " + value);
 	}
 
 	function onClickTime()
@@ -45,14 +45,16 @@
 		.querySelector("button")
 		.addEventListener("click", async (event) => 
 		{
-
 			var options = 
 			{
 				filters: 
 				[
-					{services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"]}
+					{services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"]},
+					{name: "M8 Ball"}
 				]
 			};
+
+			console.log(options);
 
 			navigator.bluetooth
 				.requestDevice(options)
@@ -85,11 +87,12 @@
 //				})
 //				.then((value) => 
 //				{
-//					Log(`Value is ${value.getUint8(0)}`);
+//					log(`Value is ${value.getUint8(0)}`);
 //				})
 				.catch((error) => 
 				{
 					console.error(error);
+					log(error.name + ": " + error.message);
 				});
 		});
 </script>
