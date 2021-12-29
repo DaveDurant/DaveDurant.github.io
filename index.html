@@ -41,15 +41,13 @@
 
 			var text = JSON.stringify(message);
 
+			console.log("sending: " + text);
+
 			var buf = new ArrayBuffer(text.length);
 
-			mChar
-				.writeValueWithResponse(buf)
-				.then(function() 
-				{
-					console.log("?");
-				});
+			await mChar.writeValueWithResponse(buf);
 
+			console.log("..done");
 		}
 	}
 
