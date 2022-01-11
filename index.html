@@ -49,7 +49,11 @@
 		console.log("onClickTime");
 		if (mChar != null)
 		{
-			var message = {time: new Date().getTime()};
+			var message = 
+			{
+				command: "set_time",
+				time: new Date().getTime()
+			};
 
 			var text = JSON.stringify(message);
 
@@ -106,6 +110,10 @@
                 {
 					mChar = characteristic;
 					characteristic.addEventListener("characteristicvaluechanged", onCharChange);
+				})
+				.then((characteristic) =>
+				{
+					log("done!");
 				})
 //				.then((characteristic) => 
 //				{
