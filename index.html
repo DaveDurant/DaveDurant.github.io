@@ -46,6 +46,23 @@
 		return buf;
 	}
 
+	function addCharacteristic(c)
+	{
+		c.startNotifications();
+		c.addEventListener("characteristicvaluechanged", onCharChange);
+
+		switch (c.uuid)
+		{
+			case CHAR_INCOMING:
+				mOut = c;
+				break;
+
+			case CHAR_OUTGOING:
+				mIn = c;
+				break;
+		}
+	}
+
 	async function onClickTime() {
 		console.log("onClickTime");
 		if (mOut != null) {
@@ -110,12 +127,7 @@
 				})
 				.then((characteristics) => 
 				{
-					log(
-						"> Characteristics: " +
-							characteristics
-								.map((c) => c.uuid)
-								.join("\n" + " ".repeat(19))
-					);
+					characteristics.map(addCharacteristic);
 				})
 
 				/*
