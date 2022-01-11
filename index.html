@@ -102,10 +102,9 @@
 				.then((service) => 
 				{
 					log("Getting Characteristics...");
-					if (characteristicUuid) {
-						// Get all characteristics that match this UUID.
-						return service.getCharacteristics(characteristicUuid);
-					}
+					//if (characteristicUuid) {
+					//	return service.getCharacteristics(characteristicUuid);
+					//}
 					// Get all characteristics.
 					return service.getCharacteristics();
 				})
