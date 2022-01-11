@@ -55,6 +55,9 @@
 		c.startNotifications();
 		c.addEventListener("characteristicvaluechanged", onCharChange);
 
+		if (c.c.oncharacteristicvaluechanged)
+			c.c.oncharacteristicvaluechanged = onCharChange;
+
 		switch (c.uuid)
 		{
 			case CHAR_INCOMING:
