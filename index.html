@@ -17,6 +17,9 @@
 </html>
 <script>
 
+	var CHAR_INCOMING = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+	var CHAR_OUTGOING = "7b286112-7eba-4c1d-bcbd-aa1c6439315b";
+	
 	var mChar;
 
 	function log(msg) 
@@ -102,10 +105,14 @@
 				{
 					return server.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
 				})
-				.then((service) => 
-				{
-					return service.getCharacteristic("beb5483e-36e1-4688-b7f5-ea07361b26a8");
+				.then((service) => { return service.getCharacteristic(CHAR_INCOMING); })
+				.then((characteristic) => characteristic.startNotifications())
+				.then((characteristic) => 
+                {
+					mChar = characteristic;
+					characteristic.addEventListener("characteristicvaluechanged", onCharChange);
 				})
+				.then((service) => { return service.getCharacteristic(CHAR_OUTGOING); })
 				.then((characteristic) => characteristic.startNotifications())
 				.then((characteristic) => 
                 {
