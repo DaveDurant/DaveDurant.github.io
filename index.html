@@ -55,8 +55,8 @@
 		c.startNotifications();
 		c.addEventListener("characteristicvaluechanged", onCharChange);
 
-		if (c.c.oncharacteristicvaluechanged)
-			c.c.oncharacteristicvaluechanged = onCharChange;
+		if (c.oncharacteristicvaluechanged)
+			c.oncharacteristicvaluechanged = onCharChange;
 
 		switch (c.uuid)
 		{
