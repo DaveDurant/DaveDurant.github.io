@@ -16,49 +16,42 @@
 	</body>
 </html>
 <script>
-
 	// incoming = FROM javascript
 	var CHAR_INCOMING = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
 	var CHAR_OUTGOING = "7b286112-7eba-4c1d-bcbd-aa1c6439315b";
-	
+
 	var mIn;
 	var mOut;
 
-	function log(msg) 
-	{
-		document.querySelector("#logs").innerHTML = document.querySelector("#logs").innerHTML + "<br>" + msg;
+	function log(msg) {
+		document.querySelector("#logs").innerHTML =
+			document.querySelector("#logs").innerHTML + "<br>" + msg;
 	}
 
-	function onCharChange(event) 
-	{
+	function onCharChange(event) {
 		log("onCharChange");
 		const value = event.target.value.getUint8();
 		console.log("Received " + value);
 
-        log("received: " + value);
+		log("received: " + value);
 	}
 
-	function str2ab(str) 
-	{
+	function str2ab(str) {
 		var buf = new ArrayBuffer(str.length);
 		var bufView = new Uint8Array(buf);
-		for (var i = 0, strLen = str.length; i < strLen; i++)
-		{
+		for (var i = 0, strLen = str.length; i < strLen; i++) {
 			bufView[i] = str.charCodeAt(i);
 		}
 
 		return buf;
-	  }
+	}
 
-	async function onClickTime()
-	{
+	async function onClickTime() {
 		console.log("onClickTime");
-		if (mOut != null)
-		{
-			var message = 
-			{
+		if (mOut != null) {
+			var message = {
 				command: "set_time",
-				time: new Date().getTime()
+				time: new Date().getTime(),
 			};
 
 			var text = JSON.stringify(message);
@@ -73,21 +66,17 @@
 
 	document
 		.querySelector("button")
-		.addEventListener("click", async (event) => 
-		{
-			var options = 
-			{
-				filters: 
-				[
-					{services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"]},
-					{name: "M8 Ball"}
-				]
+		.addEventListener("click", async (event) => {
+			var options = {
+				filters: [
+					{ services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"] },
+					{ name: "M8 Ball" },
+				],
 			};
 
-			options = 
-			{
+			options = {
 				acceptAllDevices: true,
-				optionalServices: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"]
+				optionalServices: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
 			};
 
 			console.log(options);
@@ -95,8 +84,8 @@
 			navigator.bluetooth
 				.requestDevice(options)
 				//({
-					//acceptAllDevices: true,
-					//Services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
+				//acceptAllDevices: true,
+				//Services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
 				//})
 				.then((device) => 
 				{
@@ -105,8 +94,32 @@
 				})
 				.then((server) => 
 				{
-					return server.getPrimaryService("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
+					return server.getPrimaryService(
+						"4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+					);
+					// https://googlechrome.github.io/samples/web-bluetooth/get-characteristics.html?service=4fafc201-1fb5-459e-8fcc-c5c9c331914b
 				})
+				.then((service) => 
+				{
+					log("Getting Characteristics...");
+					if (characteristicUuid) {
+						// Get all characteristics that match this UUID.
+						return service.getCharacteristics(characteristicUuid);
+					}
+					// Get all characteristics.
+					return service.getCharacteristics();
+				})
+				.then((characteristics) => 
+				{
+					log(
+						"> Characteristics: " +
+							characteristics
+								.map((c) => c.uuid)
+								.join("\n" + " ".repeat(19))
+					);
+				})
+
+				/*
 				.then((service) => { return service.getCharacteristic(CHAR_INCOMING); })
 				.then((characteristic) => characteristic.startNotifications())
 				.then((characteristic) => 
@@ -125,16 +138,17 @@
 				{
 					log("done!");
 				})
-//				.then((characteristic) => 
-//				{
-//					return characteristic.readValue();
-//				})
-//				.then((value) => 
-//				{
-//					log(`Value is ${value.getUint8(0)}`);
-//				})
-				.catch((error) => 
-				{
+*/
+
+				//				.then((characteristic) =>
+				//				{
+				//					return characteristic.readValue();
+				//				})
+				//				.then((value) =>
+				//				{
+				//					log(`Value is ${value.getUint8(0)}`);
+				//				})
+				.catch((error) => {
 					console.log(error);
 					log(error.name + ": " + error.message);
 				});
