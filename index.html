@@ -88,7 +88,16 @@
 
 			var buf = str2ab(text);
 
-			await mOut.writeValueWithResponse(buf);
+			mOut.writeValueWithResponse(buf)
+			.then((dunno) =>
+			{
+				console.log(dunno);
+			})
+			.catch((error) => 
+			{
+				console.log(error);
+				log(error.name + ": " + error.message);
+			});
 		}
 	}
 
@@ -122,47 +131,12 @@
 				})
 				.then((service) => 
 				{
-					log("Getting Characteristics...");
-					//if (characteristicUuid) {
-					//	return service.getCharacteristics(characteristicUuid);
-					//}
-					// Get all characteristics.
 					return service.getCharacteristics();
 				})
 				.then((characteristics) => 
 				{
 					characteristics.map(addCharacteristic);
 				})
-
-				/*
-				.then((service) => { return service.getCharacteristic(CHAR_INCOMING); })
-				.then((characteristic) => characteristic.startNotifications())
-				.then((characteristic) => 
-                {
-					mIn = characteristic;
-					characteristic.addEventListener("characteristicvaluechanged", onCharChange);
-				})
-				.then((service) => { return service.getCharacteristic(CHAR_OUTGOING); })
-				.then((characteristic) => characteristic.startNotifications())
-				.then((characteristic) => 
-                {
-					mOut = characteristic;
-					characteristic.addEventListener("characteristicvaluechanged", onCharChange);
-				})
-				.then((characteristic) =>
-				{
-					log("done!");
-				})
-*/
-
-				//				.then((characteristic) =>
-				//				{
-				//					return characteristic.readValue();
-				//				})
-				//				.then((value) =>
-				//				{
-				//					log(`Value is ${value.getUint8(0)}`);
-				//				})
 				.catch((error) => 
 				{
 					console.log(error);
