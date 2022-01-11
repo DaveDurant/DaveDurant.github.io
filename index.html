@@ -19,6 +19,7 @@
 	// incoming = FROM javascript
 	var CHAR_INCOMING = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
 	var CHAR_OUTGOING = "7b286112-7eba-4c1d-bcbd-aa1c6439315b";
+	var DEVICE_GUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
 
 	var mIn;
 	var mOut;
@@ -94,17 +95,8 @@
 		{
 			var options = 
 			{
-				filters: 
-				[
-					{ services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"] },
-					{ name: "M8 Ball" },
-				],
-			};
-
-			options = 
-			{
 				acceptAllDevices: true,
-				optionalServices: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
+				optionalServices: [DEVICE_GUID],
 			};
 
 			console.log(options);
@@ -122,9 +114,7 @@
 				})
 				.then((server) => 
 				{
-					return server.getPrimaryService(
-						"4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-					);
+					return server.getPrimaryService(DEVICE_GUID);
 					// https://googlechrome.github.io/samples/web-bluetooth/get-characteristics.html?service=4fafc201-1fb5-459e-8fcc-c5c9c331914b
 				})
 				.then((service) => 
