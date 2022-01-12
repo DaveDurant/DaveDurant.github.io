@@ -34,9 +34,14 @@
 	{
 		log("onCharChange");
 		const value = event.target.value.getUint8();
-		console.log("Received " + value);
+		console.log("Received " + abtostr(event.target.value));
 
 		log("received: " + value);
+	}
+
+	function ab2str(buf) 
+	{
+		return String.fromCharCode.apply(null, new Uint16Array(buf));
 	}
 
 	function str2ab(str) {
