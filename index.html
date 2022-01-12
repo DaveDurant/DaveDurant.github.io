@@ -16,10 +16,10 @@
 	</body>
 </html>
 <script>
-	// incoming = FROM javascript
+	// incoming = TO the device
 	var CHAR_INCOMING = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
 	var CHAR_OUTGOING = "7b286112-7eba-4c1d-bcbd-aa1c6439315b";
-	var DEVICE_GUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+	var SERVICE_GUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
 
 	var mIn;
 	var mOut;
@@ -50,12 +50,13 @@
 		return buf;
 	}
 
-	function addCharacteristic(c)
+	async function addCharacteristic(c)
 	{
-		c.startNotifications();
+		await c.startNotifications();
+
 		c.addEventListener("characteristicvaluechanged", onCharChange);
 
-		//if (c.oncharacteristicvaluechanged)
+		if (c.hasOwnProperty("oncharacteristicvaluechanged"))
 			c.oncharacteristicvaluechanged = onCharChange;
 
 		switch (c.uuid)
@@ -70,9 +71,10 @@
 				mIn = c;
 				break;
 		}
+
 	}
 
-	function onClickTime() 
+	async function onClickTime() 
 	{
 		console.log("onClickTime");
 		if (mOut != null) 
@@ -89,16 +91,7 @@
 
 			var buf = str2ab(text);
 
-			mOut.writeValueWithResponse(buf)
-			.then((dunno) =>
-			{
-				console.log(dunno);
-			})
-			.catch((error) => 
-			{
-				console.log(error);
-				log(error.name + ": " + error.message);
-			});
+			await mOut.writeValueWithResponse(buf)
 		}
 	}
 
@@ -109,7 +102,7 @@
 			var options = 
 			{
 				acceptAllDevices: true,
-				optionalServices: [DEVICE_GUID],
+				optionalServices: [SERVICE_GUID],
 			};
 
 			console.log(options);
@@ -127,7 +120,7 @@
 				})
 				.then((server) => 
 				{
-					return server.getPrimaryService(DEVICE_GUID);
+					return server.getPrimaryService(SERVICE_GUID);
 					// https://googlechrome.github.io/samples/web-bluetooth/get-characteristics.html?service=4fafc201-1fb5-459e-8fcc-c5c9c331914b
 				})
 				.then((service) => 
