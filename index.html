@@ -41,7 +41,8 @@
 		return new TextDecoder("utf-8").decode(event.target.value);
 	}
 
-	function str2ab(str) {
+	function str2ab(str) 
+	{
 		var buf = new ArrayBuffer(str.length);
 		var bufView = new Uint8Array(buf);
 		for (var i = 0, strLen = str.length; i < strLen; i++) 
