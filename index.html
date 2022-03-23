@@ -26,6 +26,7 @@
 			</ul>
 			<div id="tabs-connect">
 				<button onclick="onClickConnect()">Connect</button>
+				<button onclick="onClickClear()">Clear</button>
 				<textarea id="log" rows="15" style="width: 100%"></textarea>
 			</div>
 			<div id="tabs-control">
@@ -121,6 +122,11 @@
 
 			await mConnection.writeValueWithResponse(buf);
 		}
+	}
+
+	function onClickClear()
+	{
+		$("#log").text("");
 	}
 
 	function onClickConnect() 
