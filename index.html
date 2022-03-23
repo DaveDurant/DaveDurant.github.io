@@ -6,98 +6,87 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Bluetooth test</title>
 
-		<link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet">
-		<script src = "https://code.jquery.com/jquery-3.6.0.js"></script>
-		<script src = "https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+		<link
+			href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+			rel="stylesheet"
+		/>
+		<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+		<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
 	</head>
 
 	<body>
 		<h1>test ESP32 BLE web bluetooth API example</h1>
-		<button class="ui-button ui-widget ui-corner-all">CONNECT</button>
-		<button class="ui-button ui-widget ui-corner-all" onclick="onClickTime()">Set Time</button>
 		<h1></h1>
-		<div>
-			Log output:
-			<textarea id="log" rows="15" style="width: 100%" ></textarea>
-		</div>
 
 		<div id="tabs">
 			<ul>
-				<li><a href="#tabs-log">Log</a></li>
+				<li><a href="#tabs-connect">Log</a></li>
 				<li><a href="#tabs-control">Control</a></li>
 				<li><a href="#tabs-settings">Settings</a></li>
 			</ul>
-			<div id="tabs-log">
-				<p>log goes here</p>
+			<div id="tabs-connect">
+				<button onclick="onClickConnect()">Connect</button>
+				<textarea id="log" rows="15" style="width: 100%"></textarea>
 			</div>
 			<div id="tabs-control">
 				<p>control goes here</p>
 			</div>
 			<div id="tabs-settings">
-				<p>settings go here</p>
+				<button onclick="onClickTime()">Set Time</button>
 			</div>
 		</div>
 	</body>
 </html>
 
 <script>
-	var UUID_CHARACTERISTIC	= "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-	var UUID_SERVICE 		= "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+	var UUID_CHARACTERISTIC = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+	var UUID_SERVICE = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
 
 	var mConnection;
 
 	log("start");
 
-	$( function() 
-	{
-		$( ".widget input[type=submit], .widget a, .widget button" ).button();
-		$( "button, input, a" ).click( function( event ) 
-		{
+	$(function () {
+		$(".widget input[type=submit], .widget a, .widget button").button();
+		$("button, input, a").click(function (event) {
 			event.preventDefault();
 		});
 
 		$("#tabs").tabs();
 	});
 
-	function log(msg) 
-	{
+	function log(msg) {
 		console.log("log: " + msg);
 		var l = document.querySelector("#log");
-		
+
 		var prev = l.value;
-		if (prev != null && prev != "")
-			prev += "\n";
+		if (prev != null && prev != "") prev += "\n";
 
 		prev += msg;
 
 		l.value = prev;
 	}
 
-	function onCharChange(event) 
-	{
+	function onCharChange(event) {
 		const value = new TextDecoder("utf-8").decode(event.target.value);
 		log("received: " + value);
 	}
 
-	function ab2str(buf) 
-	{
+	function ab2str(buf) {
 		return new TextDecoder("utf-8").decode(event.target.value);
 	}
 
-	function str2ab(str) 
-	{
+	function str2ab(str) {
 		var buf = new ArrayBuffer(str.length);
 		var bufView = new Uint8Array(buf);
-		for (var i = 0, strLen = str.length; i < strLen; i++) 
-		{
+		for (var i = 0, strLen = str.length; i < strLen; i++) {
 			bufView[i] = str.charCodeAt(i);
 		}
 
 		return buf;
 	}
 
-	async function addCharacteristic(c)
-	{
+	async function addCharacteristic(c) {
 		await c.startNotifications();
 
 		c.addEventListener("characteristicvaluechanged", onCharChange);
@@ -105,18 +94,16 @@
 		if (c.hasOwnProperty("oncharacteristicvaluechanged"))
 			c.oncharacteristicvaluechanged = onCharChange;
 
-		switch (c.uuid)
+		switch (c.uuid) 
 		{
 			case UUID_CHARACTERISTIC:
 				log("got 'connection' " + c.uuid);
 				mConnection = c;
 				break;
 		}
-
 	}
 
-	async function onClickTime() 
-	{
+	async function onClickTime() {
 		console.log("onClickTime");
 		if (mConnection != null) 
 		{
@@ -132,50 +119,43 @@
 
 			var buf = str2ab(text);
 
-			await mConnection.writeValueWithResponse(buf)
+			await mConnection.writeValueWithResponse(buf);
 		}
 	}
 
-	document
-		.querySelector("button")
-		.addEventListener("click", async (event) => 
+	function onClickConnect() 
+	{
+		var options = 
 		{
-			var options = 
-			{
-				acceptAllDevices: true,
-				optionalServices: [UUID_SERVICE],
-			};
+			acceptAllDevices: true,
+			optionalServices: [UUID_SERVICE],
+		};
 
-			console.log(options);
+		console.log(options);
 
-			navigator.bluetooth
-				.requestDevice(options)
-				//({
-				//acceptAllDevices: true,
-				//Services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
-				//})
-				.then((device) => 
-				{
-					log("connecting to " + device.name);
-					return device.gatt.connect();
-				})
-				.then((server) => 
-				{
-					return server.getPrimaryService(UUID_SERVICE);
-					// https://googlechrome.github.io/samples/web-bluetooth/get-characteristics.html?service=4fafc201-1fb5-459e-8fcc-c5c9c331914b
-				})
-				.then((service) => 
-				{
-					return service.getCharacteristics();
-				})
-				.then((characteristics) => 
-				{
-					characteristics.map(addCharacteristic);
-				})
-				.catch((error) => 
-				{
-					console.log(error);
-					log(error.name + ": " + error.message);
-				});
-		});
+		navigator.bluetooth
+			.requestDevice(options)
+			//({
+			//acceptAllDevices: true,
+			//Services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
+			//})
+			.then((device) => {
+				log("connecting to " + device.name);
+				return device.gatt.connect();
+			})
+			.then((server) => {
+				return server.getPrimaryService(UUID_SERVICE);
+				// https://googlechrome.github.io/samples/web-bluetooth/get-characteristics.html?service=4fafc201-1fb5-459e-8fcc-c5c9c331914b
+			})
+			.then((service) => {
+				return service.getCharacteristics();
+			})
+			.then((characteristics) => {
+				characteristics.map(addCharacteristic);
+			})
+			.catch((error) => {
+				console.log(error);
+				log(error.name + ": " + error.message);
+			});
+	}
 </script>
