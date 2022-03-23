@@ -20,6 +20,23 @@
 			Log output:
 			<textarea id="log" rows="15" style="width: 100%" ></textarea>
 		</div>
+
+		<div id="tabs">
+			<ul>
+				<li><a href="#tabs-log">Log</a></li>
+				<li><a href="#tabs-control">Control</a></li>
+				<li><a href="#tabs-settings">Settings</a></li>
+			</ul>
+			<div id="tabs-log">
+				<p>log goes here</p>
+			</div>
+			<div id="tabs-control">
+				<p>control goes here</p>
+			</div>
+			<div id="tabs-settings">
+				<p>settings go here</p>
+			</div>
+		</div>
 	</body>
 </html>
 
@@ -38,6 +55,8 @@
 		{
 			event.preventDefault();
 		});
+
+		$("#tabs").tabs();
 	});
 
 	function log(msg) 
