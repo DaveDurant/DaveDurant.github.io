@@ -8,26 +8,36 @@
 	</head>
 
 	<body>
-		<h1>ESP32 BLE test web bluetooth API example</h1>
+		<h1>ESP32 M8</h1>
 		<button>CONNECT</button>
 		<button onclick="onClickTime()">Set Time</button>
 		<h1></h1>
-		<div id="logs">Log output:</div>
+		<div>
+			Log output:
+			<textarea id="log" rows="15" style="width: 100%" ></textarea>
+		</div>
 	</body>
 </html>
 <script>
-	// incoming = TO the device
-	var CHAR_INCOMING = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-	var CHAR_OUTGOING = "7b286112-7eba-4c1d-bcbd-aa1c6439315b";
-	var SERVICE_GUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+	var UUID_CHARACTERISTIC	= "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+	var UUID_SERVICE 		= "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
 
-	var mIn;
-	var mOut;
+	var mConnection;
+
+	log("start");
 
 	function log(msg) 
 	{
-		document.querySelector("#logs").innerHTML =
-			document.querySelector("#logs").innerHTML + "<br>" + msg;
+		console.log("log: " + msg);
+		var l = document.querySelector("#log");
+		
+		var prev = l.value;
+		if (prev != null && prev != "")
+			prev += "\n";
+
+		prev += msg;
+
+		l.value = prev;
 	}
 
 	function onCharChange(event) 
@@ -64,14 +74,9 @@
 
 		switch (c.uuid)
 		{
-			case CHAR_INCOMING:
-				log("got 'incoming' " + c.uuid);
-				mOut = c;
-				break;
-
-			case CHAR_OUTGOING:
-				log("got 'outgoing' " + c.uuid);
-				mIn = c;
+			case UUID_CHARACTERISTIC:
+				log("got 'connection' " + c.uuid);
+				mConnection = c;
 				break;
 		}
 
@@ -80,7 +85,7 @@
 	async function onClickTime() 
 	{
 		console.log("onClickTime");
-		if (mOut != null) 
+		if (mConnection != null) 
 		{
 			var message = 
 			{
@@ -94,7 +99,7 @@
 
 			var buf = str2ab(text);
 
-			await mOut.writeValueWithResponse(buf)
+			await mConnection.writeValueWithResponse(buf)
 		}
 	}
 
@@ -105,7 +110,7 @@
 			var options = 
 			{
 				acceptAllDevices: true,
-				optionalServices: [SERVICE_GUID],
+				optionalServices: [UUID_SERVICE],
 			};
 
 			console.log(options);
@@ -123,7 +128,7 @@
 				})
 				.then((server) => 
 				{
-					return server.getPrimaryService(SERVICE_GUID);
+					return server.getPrimaryService(UUID_SERVICE);
 					// https://googlechrome.github.io/samples/web-bluetooth/get-characteristics.html?service=4fafc201-1fb5-459e-8fcc-c5c9c331914b
 				})
 				.then((service) => 
