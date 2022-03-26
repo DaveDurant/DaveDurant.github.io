@@ -87,7 +87,8 @@
 		return buf;
 	}
 
-	async function addCharacteristic(c) {
+	async function addCharacteristic(c) 
+	{
 		await c.startNotifications();
 
 		c.addEventListener("characteristicvaluechanged", onCharChange);
@@ -104,7 +105,8 @@
 		}
 	}
 
-	async function onClickTime() {
+	async function onClickTime() 
+	{
 		console.log("onClickTime");
 		if (mConnection != null) 
 		{
@@ -129,7 +131,43 @@
 		$("#log").text("");
 	}
 
-	function onClickConnect() 
+	function onClickConnect()
+	{
+		let serviceUuid = UUID_SERVICE;
+		let characteristicUuid = UUID_CHARACTERISTIC;
+
+		log('Requesting Bluetooth Device...');
+		navigator.bluetooth.requestDevice({filters: [{services: [serviceUuid]}]})
+		.then(device => {
+		  log('Connecting to GATT Server...');
+		  return device.gatt.connect();
+		})
+		.then(server => {
+		  log('Getting Service...');
+		  return server.getPrimaryService(serviceUuid);
+		})
+		.then(service => {
+		  log('Getting Characteristic...');
+		  return service.getCharacteristic(characteristicUuid);
+		})
+		.then(characteristic => {
+		  log('> Characteristic UUID:  ' + characteristic.uuid);
+		  log('> Broadcast:            ' + characteristic.properties.broadcast);
+		  log('> Read:                 ' + characteristic.properties.read);
+		  log('> Write w/o response:   ' +
+			characteristic.properties.writeWithoutResponse);
+		  log('> Write:                ' + characteristic.properties.write);
+		  log('> Notify:               ' + characteristic.properties.notify);
+		  log('> Indicate:             ' + characteristic.properties.indicate);
+		  log('> Signed Write:         ' +
+			characteristic.properties.authenticatedSignedWrites);
+		  log('> Queued Write:         ' + characteristic.properties.reliableWrite);
+		  log('> Writable Auxiliaries: ' +
+			characteristic.properties.writableAuxiliaries);
+		})
+	}
+
+	function onClickConnectx() 
 	{
 		var options = 
 		{
