@@ -20,22 +20,30 @@
 
 		<div id="tabs">
 			<ul>
-				<li><a href="#tabs-connect">Log</a></li>
 				<li><a href="#tabs-control">Control</a></li>
 				<li><a href="#tabs-settings">Settings</a></li>
 			</ul>
-			<div id="tabs-connect">
-				<button onclick="onClickConnect()">Connect</button>
-				<button onclick="onClickClear()">Clear</button>
-				<textarea id="log" rows="15" style="width: 100%"></textarea>
-			</div>
 			<div id="tabs-control">
 				<p>control goes here</p>
 			</div>
 			<div id="tabs-settings">
 				<button onclick="onClickTime()">Set Time</button>
+				<button onclick="onClickListDir()">List Dir</button>
+				<button id="button-manual">Manual</button>
+			</div>
+			<div id="tabs-connect">
+				<button onclick="onClickConnect()">Connect</button>
+				<button onclick="onClickClear()">Clear</button>
+				<textarea id="log" rows="15" style="width: 100%"></textarea>
 			</div>
 		</div>
+
+		<div id="dialog-manual" title="Manual Send">
+			<input id="text-manual" type="text" />
+			<button onclick="sendManual()">Send</button>
+			<button onclick="closeManual()">Cancel</button>
+		</div>
+
 	</body>
 </html>
 
@@ -53,8 +61,19 @@
 			event.preventDefault();
 		});
 
+		$("#dialog-manual").dialog({ autoOpen: false });
+		$("#button-manual").click(function() 
+		{
+			$("#dialog-manual").dialog("open");
+		});
+
 		$("#tabs").tabs();
 	});
+
+	function closeManual() 
+	{
+		$("#dialog-manual").dialog("close");
+	}
 
 	function log(msg) {
 		console.log("log: " + msg);
@@ -66,6 +85,12 @@
 		prev += msg;
 
 		l.value = prev;
+
+		var ta = $('#log');
+		if (ta.length)
+		{
+			ta.scrollTop(ta[0].scrollHeight - ta.height());
+		}
 	}
 
 	function onCharChange(event) {
@@ -105,20 +130,28 @@
 		}
 	}
 
-	async function onClickTime() 
+	async function sendManual()
+	{
+		let text = $("#text-manual").val();
+
+		await sendMessage({command: "showText", text: text});
+
+		closeManual();
+	}
+
+	async function onClickListDir()
 	{
 		console.log("onClickTime");
+		await sendMessage({command: "list"});
+	}
+
+	async function sendMessage(message)
+	{
 		if (mConnection != null) 
 		{
-			var message = 
-			{
-				command: "set_time",
-				time: new Date().getTime(),
-			};
-
 			var text = JSON.stringify(message);
 
-			console.log("sending: " + text);
+			console.log("sendMessage: " + text);
 
 			var buf = str2ab(text);
 
@@ -126,80 +159,60 @@
 		}
 	}
 
+	async function onClickTime() 
+	{
+		console.log("onClickTime");
+		await sendMessage({command: "set_time", time: new Date().getTime()});
+	}
+
 	function onClickClear()
 	{
-		$("#log").text("");
+		$("#log").val("");
 	}
 
 	function onClickConnect()
 	{
-		let serviceUuid = UUID_SERVICE;
 		let characteristicUuid = UUID_CHARACTERISTIC;
+		let serviceUuid = UUID_SERVICE;
+
+		let filters = 
+		{
+			acceptAllDevices: true,
+			services: [UUID_SERVICE]
+		};
 
 		log('Requesting Bluetooth Device...');
-		navigator.bluetooth.requestDevice({filters: [{services: [serviceUuid]}]})
-		.then(device => {
+		navigator.bluetooth.requestDevice({filters: [filters]})
+		.then(device => 
+		{
 		  log('Connecting to GATT Server...');
 		  return device.gatt.connect();
 		})
-		.then(server => {
+		.then(server => 
+		{
 		  log('Getting Service...');
 		  return server.getPrimaryService(serviceUuid);
 		})
-		.then(service => {
+		.then(service => 
+		{
 		  log('Getting Characteristic...');
 		  return service.getCharacteristic(characteristicUuid);
 		})
-		.then(characteristic => {
+		.then(characteristic => 
+		{
 		  log('> Characteristic UUID:  ' + characteristic.uuid);
 		  log('> Broadcast:            ' + characteristic.properties.broadcast);
 		  log('> Read:                 ' + characteristic.properties.read);
-		  log('> Write w/o response:   ' +
-			characteristic.properties.writeWithoutResponse);
+		  log('> Write w/o response:   ' + characteristic.properties.writeWithoutResponse);
 		  log('> Write:                ' + characteristic.properties.write);
 		  log('> Notify:               ' + characteristic.properties.notify);
 		  log('> Indicate:             ' + characteristic.properties.indicate);
-		  log('> Signed Write:         ' +
-			characteristic.properties.authenticatedSignedWrites);
+		  log('> Signed Write:         ' + characteristic.properties.authenticatedSignedWrites);
 		  log('> Queued Write:         ' + characteristic.properties.reliableWrite);
-		  log('> Writable Auxiliaries: ' +
-			characteristic.properties.writableAuxiliaries);
-		})
-	}
+		  log('> Writable Auxiliaries: ' + characteristic.properties.writableAuxiliaries);
 
-	function onClickConnectx() 
-	{
-		var options = 
-		{
-			acceptAllDevices: true,
-			optionalServices: [UUID_SERVICE],
-		};
+		  addCharacteristic(characteristic);
+		});
 
-		console.log(options);
-
-		navigator.bluetooth
-			.requestDevice(options)
-			//({
-			//acceptAllDevices: true,
-			//Services: ["4fafc201-1fb5-459e-8fcc-c5c9c331914b"],
-			//})
-			.then((device) => {
-				log("connecting to " + device.name);
-				return device.gatt.connect();
-			})
-			.then((server) => {
-				return server.getPrimaryService(UUID_SERVICE);
-				// https://googlechrome.github.io/samples/web-bluetooth/get-characteristics.html?service=4fafc201-1fb5-459e-8fcc-c5c9c331914b
-			})
-			.then((service) => {
-				return service.getCharacteristics();
-			})
-			.then((characteristics) => {
-				characteristics.map(addCharacteristic);
-			})
-			.catch((error) => {
-				console.log(error);
-				log(error.name + ": " + error.message);
-			});
 	}
 </script>
